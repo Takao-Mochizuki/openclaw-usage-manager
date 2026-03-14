@@ -20,8 +20,8 @@ let cacheTimestamp = 0;
 let inflightPromise = null;
 
 const ACCOUNTS = {
-  c1: { label: "C1", opItemId: "gndrqilk2wsril4rdeoln7xc5e" },
-  c2: { label: "C2", opItemId: "zubedk7dddbjhiosyj3fho7cea" },
+  c1: { label: "C1", opItemId: "your-c1-item-id" },
+  c2: { label: "C2", opItemId: "your-c2-item-id" },
 };
 
 function getTokenFrom1Password(itemId) {
