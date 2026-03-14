@@ -2,7 +2,7 @@
 // C1/C2 Usage Checker & Auto-Switcher
 // 5h使用率 OR 7d使用率 のどちらかが80%超えたら切り替え
 // tokens.jsonからAPIキーを読む（1Password不要）
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync } from 'fs';
 
 const AUTH_FILE   = '/Users/sonia/.openclaw/agents/main/agent/auth-profiles.json';
 const TOKENS_FILE = '/Users/sonia/.openclaw/workspace/tools/usage-switch/tokens.json';
@@ -65,7 +65,9 @@ async function main() {
 
   if (needSwitch) {
     auth.profiles['anthropic:default'].token = altToken;
-    writeFileSync(AUTH_FILE, JSON.stringify(auth, null, 2));
+    const tmpFile = AUTH_FILE + ".tmp";
+    writeFileSync(tmpFile, JSON.stringify(auth, null, 2));
+    renameSync(tmpFile, AUTH_FILE); // アトミック操作
   }
 
   console.log(JSON.stringify({

@@ -194,7 +194,7 @@ server.on("error", (err) => {
   if (err.code === "EADDRINUSE") {
     console.error(`Port ${PORT} is already in use. Killing existing process...`);
     try {
-      execSync(`lsof -ti:${PORT} | xargs kill -9 2>/dev/null`);
+      execSync(`lsof -ti:${PORT} | xargs kill 2>/dev/null`);
     } catch {}
     setTimeout(() => {
       server.listen(PORT, "127.0.0.1");
