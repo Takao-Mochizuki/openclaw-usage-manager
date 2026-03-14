@@ -4,8 +4,8 @@
 // tokens.jsonからAPIキーを読む（1Password不要）
 import { readFileSync, writeFileSync, renameSync } from 'fs';
 
-const AUTH_FILE   = '/Users/sonia/.openclaw/agents/main/agent/auth-profiles.json';
-const TOKENS_FILE = '/Users/sonia/.openclaw/workspace/tools/usage-switch/tokens.json';
+const AUTH_FILE = `${process.env.HOME}/.openclaw/agents/main/agent/auth-profiles.json`;
+const TOKENS_FILE = `${process.env.HOME}/.openclaw/workspace/tools/usage-switch/tokens.json`;
 const THRESHOLD   = 0.80;
 
 function loadTokens() {
