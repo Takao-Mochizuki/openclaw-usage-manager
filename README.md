@@ -76,8 +76,9 @@ openclaw-usage-manager/
 │   ├── server.mjs        # Dashboard server (Node.js, zero dependencies)
 │   └── index.html         # Dashboard UI (dark theme, responsive)
 ├── usage-switch/
-│   ├── check.mjs          # Usage checker & auto-switcher
-│   └── setup-tokens.sh    # One-time setup (1Password → tokens.json)
+│   ├── check.mjs               # Usage checker & auto-switcher
+│   ├── setup-tokens.sh         # One-time setup (1Password → tokens.json)
+│   └── setup-tokens-simple.sh  # One-time setup (interactive, no 1Password)
 ├── .gitignore             # Excludes tokens.json, *.env
 └── README.md
 ```
@@ -91,7 +92,7 @@ openclaw-usage-manager/
 | [OpenClaw](https://openclaw.ai) | Installed and configured / インストール・設定済み |
 | Claude Max x 2 accounts | Two separate Anthropic subscriptions (C1 and C2) / 2つのAnthropicサブスクリプション |
 | Node.js >= 18 | Required for `fetch()` API / `fetch()` APIのため |
-| [1Password CLI](https://developer.1password.com/docs/cli/) (`op`) | **Recommended** — secure token storage / セキュアなトークン管理（推奨） |
+| [1Password CLI](https://developer.1password.com/docs/cli/) (`op`) | **Optional** — `op` command recommended, not required / セキュアなトークン管理（推奨だが必須ではない） |
 
 > **Why Node.js only?** This project has zero npm dependencies. It uses only Node.js built-in modules (`http`, `fs`, `crypto`). No `npm install` required.
 >
@@ -273,16 +274,30 @@ cp usage-dashboard/server.mjs ~/.openclaw/workspace/tools/usage-dashboard/
 cp usage-dashboard/index.html ~/.openclaw/workspace/tools/usage-dashboard/
 cp usage-switch/check.mjs ~/.openclaw/workspace/tools/usage-switch/
 cp usage-switch/setup-tokens.sh ~/.openclaw/workspace/tools/usage-switch/
+cp usage-switch/setup-tokens-simple.sh ~/.openclaw/workspace/tools/usage-switch/
 
-# Make setup script executable
+# Make setup scripts executable
 chmod +x ~/.openclaw/workspace/tools/usage-switch/setup-tokens.sh
+chmod +x ~/.openclaw/workspace/tools/usage-switch/setup-tokens-simple.sh
 ```
 
-### Step 3: Configure your 1Password item IDs / 1PasswordアイテムIDを設定
+### Step 3: Configure tokens / トークンを設定
 
-**Why:** The scripts ship with placeholder IDs. You must replace them with your own 1Password item IDs so the tools can access your tokens.
+#### 方法A: 対話式入力（推奨・1Password不要）
+#### Method A: Interactive input (recommended, no 1Password needed)
 
-**理由:** スクリプトにはプレースホルダーIDが含まれています。自分の1PasswordアイテムIDに置き換える必要があります。
+トークンは `claude setup-token` コマンドで取得できます。
+Run `claude setup-token` to get your token.
+
+```bash
+chmod +x ~/.openclaw/workspace/tools/usage-switch/setup-tokens-simple.sh
+~/.openclaw/workspace/tools/usage-switch/setup-tokens-simple.sh
+# プロンプトに従いC1・C2のトークンを入力
+# Follow the prompts to enter your C1 and C2 tokens
+```
+
+#### 方法B: 1Password CLI（セキュリティ重視）
+#### Method B: 1Password CLI (for security-conscious users)
 
 Replace the hardcoded item IDs in these files:
 
@@ -291,37 +306,25 @@ Replace the hardcoded item IDs in these files:
 **`setup-tokens.sh`** — lines 5–6:
 ```bash
 # Find and replace the item IDs:
-# Before:
-C1_TOKEN=$(op item get your-c1-item-id ...)
-C2_TOKEN=$(op item get your-c2-item-id ...)
-
-# After (use your own item IDs):
 C1_TOKEN=$(op item get your-c1-item-id ...)
 C2_TOKEN=$(op item get your-c2-item-id ...)
 ```
 
 **`server.mjs`** — the `ACCOUNTS` object near the top:
 ```javascript
-// Before:
-const ACCOUNTS = {
-  c1: { label: "C1", opItemId: "your-c1-item-id" },
-  c2: { label: "C2", opItemId: "your-c2-item-id" },
-};
-
-// After (use your own item IDs):
 const ACCOUNTS = {
   c1: { label: "C1", opItemId: "your-c1-item-id" },
   c2: { label: "C2", opItemId: "your-c2-item-id" },
 };
 ```
 
-### Step 4: Run token setup / トークンセットアップ
+Then run the 1Password setup script:
 
 ```bash
 ~/.openclaw/workspace/tools/usage-switch/setup-tokens.sh
 ```
 
-### Step 5: Update file paths (if needed) / パスの確認
+### Step 4: Update file paths (if needed) / パスの確認
 
 The auto-switcher (`check.mjs`) reads and writes OpenClaw's `auth-profiles.json`. The default paths are:
 
